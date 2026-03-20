@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>原液DB - YONEMOTO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#f8f7f4;color:#1a1a1a;font-family:'Noto Serif JP',serif;min-height:100vh}
+textarea,input{font-family:'Noto Serif JP',serif}
+button{cursor:pointer;font-family:'DM Mono',monospace}
+button:hover{opacity:.85}
+.hidden{display:none!important}
+nav{display:flex;justify-content:space-between;align-items:center;padding:14px 20px;border-bottom:1px solid #e8e7e2;background:#f8f7f4;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:8px}
+.brand{display:flex;align-items:baseline;gap:10px}
+.brand-mark{font-family:'DM Mono',monospace;font-size:15px;font-weight:500;color:#c8b560;letter-spacing:.05em}
+.brand-sub{font-family:'DM Mono',monospace;font-size:10px;color:#666;letter-spacing:.2em}
+.nav-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.stat-chip{display:flex;align-items:center;gap:5px;font-size:11px;color:#666;font-family:'DM Mono',monospace}
+.stat-dot{width:6px;height:6px;border-radius:50%;background:#c8b560;box-shadow:0 0 6px #c8b56066}
+.nav-btn{padding:6px 12px;background:transparent;border:1px solid #e0dfd9;border-radius:5px;color:#666;font-size:12px;position:relative}
+.nav-btn.active{background:#1a1a1a;border-color:#999;color:#1a1a1a}
+.badge{position:absolute;top:-6px;right:-6px;background:#c8b560;color:#0d0d0d;border-radius:50%;width:16px;height:16px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:700}
+.main{max-width:700px;margin:0 auto;padding:24px 16px}
+.hero{margin-bottom:24px;text-align:center}
+.hero-eyebrow{font-family:'DM Mono',monospace;font-size:10px;color:#c8b560;letter-spacing:.3em;margin-bottom:10px}
+.hero-title{font-size:22px;font-weight:700;color:#1a1a1a;line-height:1.3;margin-bottom:8px}
+.hero-sub{font-size:13px;color:#666}
+.input-card{background:#ffffff;border:1px solid #e0dfd9;border-radius:12px;padding:16px;margin-bottom:16px}
+.textarea{width:100%;background:#f8f7f4;border:1px solid #e0dfd9;border-radius:8px;padding:12px 14px;color:#1a1a1a;font-size:14px;line-height:1.7;resize:vertical}
+.textarea:focus{outline:none;border-color:#c8b56055}
+.input-footer{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
+.input-hint{font-family:'DM Mono',monospace;font-size:10px;color:#999}
+.btn{padding:9px 20px;background:#c8b560;border:none;border-radius:6px;color:#0d0d0d;font-size:13px;font-weight:500}
+.btn:disabled{background:#1a1a1a;color:#666;cursor:not-allowed;opacity:1}
+.alert-card{background:#fff5f0;border:1px solid #e8734a44;border-radius:10px;padding:14px 16px;margin-bottom:14px;display:flex;gap:12px;align-items:flex-start}
+.alert-icon{font-size:16px;color:#e8734a;flex-shrink:0}
+.alert-title{font-size:13px;font-weight:700;color:#e8734a;margin-bottom:3px}
+.alert-body{font-size:12px;color:#885544;line-height:1.6}
+.similar-card{background:#f5f4f0;border:1px solid #e0dfd9;border-radius:8px;padding:12px 14px;margin-bottom:8px}
+.similar-header{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.score-bar-wrap{width:36px;height:4px;background:#1a1a1a;border-radius:2px;overflow:hidden;flex-shrink:0}
+.score-fill{height:100%;border-radius:2px}
+.score-num{font-family:'DM Mono',monospace;font-size:10px}
+.similar-reason{font-size:11px;color:#666}
+.similar-q{font-size:13px;color:#555;margin-bottom:4px}
+.similar-a{font-size:12px;color:#666;line-height:1.5}
+.similar-pending{font-size:11px;color:#999}
+.section-label{font-family:'DM Mono',monospace;font-size:10px;color:#666;letter-spacing:.2em;margin-bottom:10px}
+.result-card{background:#ffffff;border:1px solid #e0dfd9;border-left:3px solid #c8b560;border-radius:12px;padding:20px;margin-bottom:20px}
+.result-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:6px}
+.result-label{font-family:'DM Mono',monospace;font-size:10px;color:#c8b560;letter-spacing:.2em}
+.result-note{font-size:10px;color:#666}
+.result-q{font-size:12px;color:#666;margin-bottom:12px;font-style:italic}
+.result-a{font-size:14px;line-height:1.85;color:#333;margin-bottom:12px;white-space:pre-wrap}
+.result-disclaimer{font-size:10px;color:#999}
+.recent-row{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #efefea}
+.dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
+.dot.on{background:#c8b560}
+.dot.off{background:#ccc}
+.recent-q{font-size:13px;color:#666;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.recent-date{font-family:'DM Mono',monospace;font-size:10px;color:#999;flex-shrink:0}
+.login-wrap{max-width:360px;margin:60px auto;background:#ffffff;border:1px solid #e0dfd9;border-radius:12px;padding:28px;display:flex;flex-direction:column;gap:14px}
+.login-title{font-size:16px;font-weight:700}
+.login-sub{font-size:12px;color:#666;line-height:1.7}
+.login-input{width:100%;background:#f8f7f4;border:1px solid #e0dfd9;border-radius:6px;padding:10px 14px;color:#1a1a1a;font-size:14px}
+.login-input:focus{outline:none;border-color:#c8b56055}
+.stats-bar{display:flex;gap:10px;margin-bottom:20px}
+.stat-box{flex:1;background:#ffffff;border:1px solid #e8e7e2;border-radius:10px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.stat-box.accent{border-color:#c8b56033;background:#fdf9e8}
+.stat-value{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;color:#666}
+.stat-value.accent{color:#c8b560}
+.stat-label{font-size:11px;color:#999}
+.logout-btn{background:none;border:1px solid #e0dfd9;border-radius:8px;color:#666;font-size:11px;padding:6px 12px}
+.tabs{display:flex;gap:6px;margin-bottom:16px;border-bottom:1px solid #e8e7e2;padding-bottom:12px;flex-wrap:wrap}
+.tab{padding:6px 14px;background:transparent;border:1px solid #e8e7e2;border-radius:5px;color:#666;font-size:12px}
+.tab.active{background:#1a1a1a;border-color:#999;color:#1a1a1a}
+.q-card{background:#ffffff;border:1px solid #e0dfd9;border-radius:12px;padding:16px;margin-bottom:10px}
+.q-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.q-time{font-family:'DM Mono',monospace;font-size:10px;color:#999}
+.delete-btn{background:none;border:none;color:#999;font-size:11px;padding:2px 6px}
+.edit-btn{background:none;border:1px solid #2a2a2a;border-radius:4px;color:#666;font-size:11px;padding:3px 10px}
+.q-text{font-size:14px;line-height:1.6;color:#666;margin-bottom:12px}
+.related-hint{background:#f8f7f4;border:1px solid #e8e7e2;border-radius:8px;padding:10px 12px;margin-bottom:12px}
+.related-label{font-family:'DM Mono',monospace;font-size:9px;color:#c8b560;letter-spacing:.2em;margin-bottom:6px}
+.related-item{margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid #e8e7e2}
+.related-q{font-size:11px;color:#666;margin-bottom:2px}
+.related-a{font-size:12px;color:#666;line-height:1.5}
+.ans-input{width:100%;background:#f8f7f4;border:1px solid #e0dfd9;border-radius:8px;padding:12px 14px;color:#1a1a1a;font-size:13px;line-height:1.7;resize:vertical;margin-bottom:10px}
+.ans-input:focus{outline:none;border-color:#c8b56055}
+.q-actions{display:flex;justify-content:space-between;align-items:center}
+.save-btn{padding:8px 18px;background:#c8b560;border:none;border-radius:5px;color:#0d0d0d;font-size:13px}
+.save-btn:disabled{background:#1a1a1a;color:#999;cursor:not-allowed}
+.log-card{background:#f5f4f0;border:1px solid #e8e7e2;border-radius:12px;padding:16px;margin-bottom:10px}
+.log-ans{font-size:13px;line-height:1.8;color:#666;white-space:pre-wrap}
+.add-wrap{display:flex;flex-direction:column;gap:12px}
+.empty{text-align:center;padding:50px 0;font-size:13px;color:#999}
+.cluster-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;gap:12px}
+.cluster-title{font-size:20px;font-weight:700;margin-bottom:4px}
+.cluster-sub{font-size:12px;color:#666}
+.cluster-card{background:#ffffff;border:1px solid #e0dfd9;border-radius:10px;overflow:hidden;margin-bottom:10px;cursor:pointer}
+.cluster-card.warn{border-color:#e8734a33}
+.cluster-top{display:flex;justify-content:space-between;align-items:center;padding:14px 18px}
+.cluster-meta{display:flex;align-items:center;gap:8px}
+.cluster-label{font-size:14px;font-weight:600}
+.warn-tag{font-size:10px;background:#e8734a22;color:#e8734a;padding:2px 8px;border-radius:4px;font-family:'DM Mono',monospace}
+.cluster-right{display:flex;align-items:center;gap:8px}
+.cluster-count{font-family:'DM Mono',monospace;font-size:12px;color:#c8b560}
+.cluster-items{border-top:1px solid #1a1a1a;padding:0 18px}
+.cluster-item{padding:12px 0;border-bottom:1px solid #efefea}
+.cluster-item-q{font-size:13px;color:#555;margin-bottom:4px}
+.cluster-item-a{font-size:12px;color:#666;line-height:1.6}
+.cluster-item-pending{font-size:11px;color:#999}
+#toast{display:none;position:fixed;top:16px;left:50%;transform:translateX(-50%);color:#0d0d0d;padding:8px 20px;border-radius:6px;font-size:12px;font-weight:500;z-index:999;font-family:'DM Mono',monospace;box-shadow:0 4px 20px rgba(0,0,0,.3);white-space:nowrap}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:#f0efeb}
+::-webkit-scrollbar-thumb{background:#ccc}
+</style>
+</head>
+<body>
+
+<div id="toast"></div>
+
+<nav>
+  <div class="brand">
+    <span class="brand-mark">原液</span>
+    <span class="brand-sub">YONEMOTO DB</span>
+  </div>
+  <div class="nav-right">
+    <span class="stat-chip"><span class="stat-dot"></span><span id="stat-count">0件蓄積</span></span>
+    <button id="nav-ask" class="nav-btn active" onclick="setView('ask')">質問する</button>
+    <button id="nav-answer" class="nav-btn" onclick="gotoAnswer()" style="position:relative">
+      回答モード<span id="badge" class="badge hidden"></span>
+    </button>
+    <button id="nav-cluster" class="nav-btn" onclick="gotoCluster()">分析</button>
+  </div>
+</nav>
+
+<!-- ASK -->
+<div id="view-ask" class="main">
+  <div class="hero">
+    <p class="hero-eyebrow">Ask Yonemoto</p>
+    <h1 class="hero-title">何でも聞いてください</h1>
+    <p class="hero-sub" id="hero-sub">米本の思考スタイルをもとにAIが答えます</p>
+  </div>
+  <div class="input-card">
+    <textarea id="ask-input" class="textarea" placeholder="リスキリング、経営、AI活用、チーム運営、思考法…" rows="4"></textarea>
+    <div class="input-footer">
+      <span class="input-hint">⌘ Enter</span>
+      <button id="ask-btn" class="btn" onclick="handleAsk()">聞く →</button>
+    </div>
+  </div>
+  <div id="ask-alert" class="alert-card hidden">
+    <span class="alert-icon">⚠</span>
+    <div><p class="alert-title">類似質問で回答に齟齬があります</p><p class="alert-body" id="alert-body"></p></div>
+  </div>
+  <div id="ask-similar" class="hidden">
+    <p class="section-label">類似した質問が見つかりました</p>
+    <div id="similar-list"></div>
+  </div>
+  <div id="ask-result" class="result-card hidden">
+    <div class="result-header">
+      <span class="result-label">米本の回答</span>
+      <span class="result-note" id="result-note"></span>
+    </div>
+    <p class="result-q" id="result-q"></p>
+    <p class="result-a" id="result-a"></p>
+    <p class="result-disclaimer">※ AIが米本の思考スタイルを模して生成しました</p>
+  </div>
+  <div id="recent-section">
+    <p class="section-label">最近の質問</p>
+    <div id="recent-list"></div>
+  </div>
+</div>
+
+<!-- LOGIN -->
+<div id="view-login" class="main hidden">
+  <div class="login-wrap">
+    <p class="login-title">管理者ログイン</p>
+    <p class="login-sub">米本さん専用。Firebaseで登録したメールアドレスとパスワードでログインしてください。</p>
+    <input id="login-email" type="email" class="login-input" placeholder="メールアドレス">
+    <input id="login-pw" type="password" class="login-input" placeholder="パスワード">
+    <button class="btn" onclick="handleLogin()">ログイン</button>
+  </div>
+</div>
+
+<!-- ANSWER -->
+<div id="view-answer" class="main hidden">
+  <div class="stats-bar">
+    <div class="stat-box accent"><span class="stat-value accent" id="s-accumulated">0</span><span class="stat-label">蓄積済み</span></div>
+    <div class="stat-box"><span class="stat-value" id="s-pending">0</span><span class="stat-label">未回答</span></div>
+    <div class="stat-box"><span class="stat-value" id="s-total">0</span><span class="stat-label">合計</span></div>
+    <button class="logout-btn" onclick="handleLogout()">ログアウト</button>
+  </div>
+  <div class="tabs">
+    <button id="tab-queue" class="tab active" onclick="switchTab('queue')"><span id="tab-queue-label">未回答 0</span></button>
+    <button id="tab-log" class="tab" onclick="switchTab('log')"><span id="tab-log-label">回答済み 0</span></button>
+    <button id="tab-add" class="tab" onclick="switchTab('add')">+ 追加</button>
+  </div>
+  <div id="tab-content"></div>
+</div>
+
+<!-- CLUSTER -->
+<div id="view-cluster" class="main hidden">
+  <div class="cluster-header">
+    <div>
+      <p class="hero-eyebrow">Question Analysis</p>
+      <h2 class="cluster-title">類似質問クラスター</h2>
+      <p class="cluster-sub">パート会議・FAQ整理に活用できます</p>
+    </div>
+    <button id="cluster-btn" class="btn" onclick="handleCluster()">分析する</button>
+  </div>
+  <div id="cluster-result"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyD-RW3aO77bfC9N2W4Tur6WKrAdIH0xvY8",
+  authDomain: "genekipj.firebaseapp.com",
+  projectId: "genekipj",
+  storageBucket: "genekipj.firebasestorage.app",
+  messagingSenderId: "743807107914",
+  appId: "1:743807107914:web:5c0ce47e5872e96e4e37b3"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+const col = collection(db, "questions");
+
+window._db = db; window._col = col; window._auth = auth;
+window._signIn = signInWithEmailAndPassword;
+window._signOut = signOut;
+window._addDoc = addDoc;
+window._doc = doc;
+window._updateDoc = updateDoc;
+window._deleteDoc = deleteDoc;
+
+let allDocs = [];
+let currentUser = null;
+let currentTab = "queue";
+
+const q = query(col, orderBy("createdAt","desc"));
+onSnapshot(q, snap => {
+  allDocs = snap.docs.map(d => ({id:d.id,...d.data()}));
+  window._allDocs = allDocs;
+  updateNav();
+  if(document.getElementById("view-ask").classList.contains("hidden")===false) renderRecent();
+  if(document.getElementById("view-answer").classList.contains("hidden")===false) renderAnswer();
+});
+
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+  window._currentUser = user;
+  updateNav();
+});
+
+window._getCurrentUser = () => currentUser;
+window._getCurrentTab = () => currentTab;
+window._setCurrentTab = v => { currentTab = v; };
+
+function updateNav() {
+  const answered = allDocs.filter(i=>i.answer).length;
+  document.getElementById("stat-count").textContent = `${answered}件蓄積`;
+  const pending = allDocs.filter(i=>!i.answer).length;
+  const badge = document.getElementById("badge");
+  if(pending>0){badge.textContent=pending;badge.classList.remove("hidden");}
+  else badge.classList.add("hidden");
+  document.getElementById("nav-answer").textContent = currentUser ? "回答モード" : "回答モード🔒";
+  if(pending>0){
+    const b = document.createElement("span");
+    b.className="badge"; b.textContent=pending;
+    document.getElementById("nav-answer").appendChild(b);
+  }
+}
+
+function renderRecent() {
+  const answered = allDocs.filter(i=>i.answer).length;
+  document.getElementById("hero-sub").textContent = answered>0 ? `${answered}件の実回答学習済み` : "米本の思考スタイルをもとにAIが答えます";
+  const list = document.getElementById("recent-list");
+  if(!list) return;
+  list.innerHTML = allDocs.slice(0,6).map(item=>`
+    <div class="recent-row">
+      <span class="dot ${item.answer?'on':'off'}"></span>
+      <span class="recent-q">${escHtml(item.question)}</span>
+      <span class="recent-date">${fmtDate(item.createdAt)}</span>
+    </div>`).join("");
+}
+
+function renderAnswer() {
+  const pending = allDocs.filter(i=>!i.answer);
+  const answered = allDocs.filter(i=>i.answer);
+  document.getElementById("s-accumulated").textContent = answered.length;
+  document.getElementById("s-pending").textContent = pending.length;
+  document.getElementById("s-total").textContent = allDocs.length;
+  document.getElementById("tab-queue-label").textContent = `未回答 ${pending.length}`;
+  document.getElementById("tab-log-label").textContent = `回答済み ${answered.length}`;
+  renderTab();
+}
+
+function renderTab() {
+  const tab = window._getCurrentTab();
+  const pending = allDocs.filter(i=>!i.answer);
+  const answered = allDocs.filter(i=>i.answer);
+  const content = document.getElementById("tab-content");
+
+  if(tab==="queue"){
+    content.innerHTML = pending.length===0 ? '<div class="empty">未回答なし 🎉</div>'
+      : pending.map(item=>{
+          const related = (item.similarIds||[]).map(id=>allDocs.find(d=>d.id===id)).filter(d=>d&&d.answer);
+          return `<div class="q-card">
+            <div class="q-card-top">
+              <span class="q-time">${fmtDate(item.createdAt)}</span>
+              <button class="delete-btn" onclick="delQ('${item.id}')">削除</button>
+            </div>
+            <p class="q-text">${escHtml(item.question)}</p>
+            ${related.length>0?`<div class="related-hint"><p class="related-label">類似質問への既存回答（参考）</p>${related.map(r=>`<div class="related-item"><p class="related-q">${escHtml(r.question)}</p><p class="related-a">${escHtml(r.answer.slice(0,100))}...</p></div>`).join("")}</div>`:""}
+            <textarea id="ta-${item.id}" class="ans-input" placeholder="米本として回答を入力... (⌘Enter で保存)" rows="5" oninput="checkSave('${item.id}')" onkeydown="taKeydown(event,'${item.id}')"></textarea>
+            <div class="q-actions">
+              <span class="input-hint">⌘ Enter で保存</span>
+              <button id="sb-${item.id}" class="save-btn" disabled onclick="saveQ('${item.id}')">保存 →</button>
+            </div>
+          </div>`;
+        }).join("");
+  } else if(tab==="log"){
+    content.innerHTML = answered.length===0 ? '<div class="empty">まだ回答がありません</div>'
+      : [...answered].map(item=>`
+          <div class="log-card" id="lc-${item.id}">
+            <div class="q-card-top">
+              <span class="q-time">${fmtDate(item.createdAt)}</span>
+              <div style="display:flex;gap:8px">
+                <button class="edit-btn" onclick="toggleEdit('${item.id}')">編集</button>
+                <button class="delete-btn" onclick="delQ('${item.id}')">削除</button>
+              </div>
+            </div>
+            <p class="q-text">${escHtml(item.question)}</p>
+            <p class="log-ans" id="la-${item.id}">${escHtml(item.answer)}</p>
+          </div>`).join("");
+  } else {
+    content.innerHTML = `<div class="add-wrap">
+      <textarea id="new-q-ta" class="textarea" placeholder="質問を入力..." rows="4"></textarea>
+      <button class="btn" onclick="addNewQ()">追加する</button>
+    </div>`;
+  }
+}
+
+window.switchTab = t => {
+  window._setCurrentTab(t);
+  ["queue","log","add"].forEach(x=>{
+    document.getElementById("tab-"+x).classList.toggle("active",x===t);
+  });
+  renderTab();
+};
+
+window.checkSave = id => {
+  const ta = document.getElementById("ta-"+id);
+  const btn = document.getElementById("sb-"+id);
+  if(btn) btn.disabled = !ta.value.trim();
+};
+window.taKeydown = (e,id) => {
+  if(e.key==="Enter"&&e.metaKey){ const ta=document.getElementById("ta-"+id); if(ta.value.trim()) saveQ(id); }
+};
+window.saveQ = async id => {
+  const ta = document.getElementById("ta-"+id);
+  if(!ta||!ta.value.trim()) return;
+  await window._updateDoc(window._doc(window._db,"questions",id),{answer:ta.value.trim(),answeredAt:new Date()});
+  showToast("✓ 保存");
+};
+window.delQ = async id => {
+  if(!confirm("削除しますか？")) return;
+  await window._deleteDoc(window._doc(window._db,"questions",id));
+  showToast("削除しました");
+};
+window.addNewQ = async () => {
+  const ta = document.getElementById("new-q-ta");
+  if(!ta||!ta.value.trim()) return;
+  await window._addDoc(window._col,{question:ta.value.trim(),answer:"",aiCache:"",similarIds:[],createdAt:new Date(),answeredAt:null});
+  showToast("追加しました");
+  window.switchTab("queue");
+};
+window.toggleEdit = id => {
+  const lc = document.getElementById("lc-"+id);
+  const la = document.getElementById("la-"+id);
+  const item = allDocs.find(d=>d.id===id);
+  if(!item) return;
+  if(lc.querySelector(".edit-ta")){
+    const ta = lc.querySelector(".edit-ta");
+    if(ta.value.trim()) window._updateDoc(window._doc(window._db,"questions",id),{answer:ta.value.trim(),answeredAt:new Date()}).then(()=>showToast("✓ 更新"));
+    renderTab(); return;
+  }
+  la.style.display="none";
+  const ta = document.createElement("textarea");
+  ta.className="ans-input edit-ta"; ta.value=item.answer; ta.rows=5;
+  lc.appendChild(ta);
+  const sb = document.createElement("button");
+  sb.className="save-btn"; sb.textContent="保存";
+  sb.onclick=()=>{ if(ta.value.trim()) window._updateDoc(window._doc(window._db,"questions",id),{answer:ta.value.trim(),answeredAt:new Date()}).then(()=>{ showToast("✓ 更新"); renderTab(); }); };
+  lc.appendChild(sb);
+};
+
+// ─── Claude API ───────────────────────────────────────────
+async function callClaude(system, userMsg, maxTokens=1000) {
+  const res = await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:maxTokens,system,messages:[{role:"user",content:userMsg}]})
+  });
+  const data = await res.json();
+  if(!res.ok) throw new Error(data.error?.message||"API error");
+  return data.content[0].text;
+}
+
+window.handleAsk = async () => {
+  const q = document.getElementById("ask-input").value.trim();
+  if(!q) return;
+  const btn = document.getElementById("ask-btn");
+  btn.disabled=true;
+  hideEl("ask-alert"); hideEl("ask-similar"); hideEl("ask-result"); hideEl("recent-section");
+
+  btn.textContent="類似確認中...";
+  let simItems=[], contradiction=false;
+  if(allDocs.length>0){
+    const dbStr = allDocs.map((i,idx)=>`[${idx}] Q: ${i.question}${i.answer?` | A: ${i.answer.slice(0,50)}...`:" | 未回答"}`).join("\n");
+    try {
+      const txt = await callClaude("質問分析AIです。JSONのみ返してください。",
+        `新しい質問:「${q}」\n\n既存DB:\n${dbStr}\n\n{"similar":[{"index":数値,"score":0-100,"reason":"一言"}],"contradiction":false}\n\nスコア60以上のみ最大3件。`,800);
+      const parsed = JSON.parse(txt.replace(/```json|```/g,"").trim());
+      simItems = (parsed.similar||[]).map(s=>({...s,item:allDocs[s.index]})).filter(s=>s.item);
+      contradiction = parsed.contradiction||false;
+    } catch(e){}
+  }
+
+  if(contradiction){
+    document.getElementById("alert-body").textContent = typeof contradiction==="string"?contradiction:"既存回答を確認してください";
+    showEl("ask-alert");
+  }
+  if(simItems.length>0){
+    document.getElementById("similar-list").innerHTML = simItems.map(s=>`
+      <div class="similar-card">
+        <div class="similar-header">
+          <div class="score-bar-wrap"><div class="score-fill" style="width:${s.score}%;background:${s.score>=85?'#e8734a':s.score>=70?'#c8b560':'#555'}"></div></div>
+          <span class="score-num" style="color:${s.score>=85?'#e8734a':s.score>=70?'#c8b560':'#555'}">${s.score}%</span>
+          <span class="similar-reason">${escHtml(s.reason)}</span>
+        </div>
+        <p class="similar-q">${escHtml(s.item.question)}</p>
+        ${s.item.answer?`<p class="similar-a">${escHtml(s.item.answer.slice(0,120))}...</p>`:'<p class="similar-pending">未回答</p>'}
+      </div>`).join("");
+    showEl("ask-similar");
+  }
+
+  btn.textContent="考え中...";
+  try {
+    const examples = allDocs.filter(i=>i.answer).slice(-20);
+    const exStr = examples.length>0 ? examples.map(e=>`Q: ${e.question}\nA: ${e.answer}`).join("\n\n") : "（まだ蓄積なし）";
+    const system = `あなたは「米本貴久」として回答します。\n【人物像】リスキリング支援ビジネスを経営するエグゼクティブ。発散型思考。AIを積極活用。落ち着いた分析的トーン。一人称は「自分」または省略。結論→理由→補足の順。\n【実際の回答例】\n${exStr}\n\n上記の言葉の癖・思考パターンを学習し、同じ人物として自然に回答してください。`;
+    const aiAns = await callClaude(system, q);
+    await window._addDoc(window._col,{question:q,answer:"",aiCache:aiAns,similarIds:simItems.map(s=>s.item.id),createdAt:new Date(),answeredAt:null});
+    document.getElementById("result-q").textContent = `「${q}」`;
+    document.getElementById("result-a").textContent = aiAns;
+    document.getElementById("result-note").textContent = `AI生成 · ${allDocs.filter(i=>i.answer).length}件学習済`;
+    showEl("ask-result");
+    document.getElementById("ask-input").value="";
+  } catch(e){ showToast("エラー: "+e.message,"err"); }
+  btn.disabled=false; btn.textContent="聞く →";
+};
+
+document.getElementById("ask-input").addEventListener("keydown", e=>{
+  if(e.key==="Enter"&&e.metaKey) window.handleAsk();
+});
+document.getElementById("login-pw").addEventListener("keydown", e=>{
+  if(e.key==="Enter") window.handleLogin();
+});
+
+window.handleLogin = async () => {
+  const email = document.getElementById("login-email").value;
+  const pw = document.getElementById("login-pw").value;
+  try {
+    await window._signIn(window._auth, email, pw);
+    setView("answer");
+  } catch(e){ showToast("ログイン失敗。メールかパスワードを確認してください","err"); }
+};
+window.handleLogout = async () => {
+  await window._signOut(window._auth);
+  setView("ask");
+};
+
+window.handleCluster = async () => {
+  if(allDocs.length<2){ showToast("質問が2件以上必要です","err"); return; }
+  const btn = document.getElementById("cluster-btn");
+  btn.disabled=true; btn.textContent="分析中...";
+  document.getElementById("cluster-result").innerHTML='<div class="empty">分析中...</div>';
+  const dbStr = allDocs.map((i,idx)=>`[${idx}] ${i.question}`).join("\n");
+  let clusters=[];
+  try {
+    const txt = await callClaude("質問グループ化AIです。JSONのみ返してください。",
+      `以下をテーマ別にグループ化:\n${dbStr}\n\n形式:[{"label":"グループ名","indices":[0,1],"hasContradiction":false}]\n1グループ2件以上のみ。`,1500);
+    clusters = JSON.parse(txt.replace(/```json|```/g,"").trim());
+  } catch(e){}
+  btn.disabled=false; btn.textContent="分析する";
+
+  const contradictions = clusters.filter(c=>c.hasContradiction);
+  let html="";
+  if(contradictions.length>0){
+    html+=`<div class="alert-card"><span class="alert-icon">⚠</span><div><p class="alert-title">${contradictions.length}件で齟齬があります</p><p class="alert-body">${contradictions.map(c=>escHtml(c.label)).join("、")}</p></div></div>`;
+  }
+  if(clusters.length===0){ html+='<div class="empty">グループ化できる類似質問がありませんでした</div>'; }
+  else {
+    clusters.forEach((cluster,ci)=>{
+      const items = cluster.indices.map(i=>allDocs[i]).filter(Boolean);
+      html+=`<div class="cluster-card${cluster.hasContradiction?' warn':''}" onclick="toggleCluster(${ci})">
+        <div class="cluster-top">
+          <div class="cluster-meta"><span class="cluster-label">${escHtml(cluster.label)}</span>${cluster.hasContradiction?'<span class="warn-tag">齟齬あり</span>':''}</div>
+          <div class="cluster-right"><span class="cluster-count">${items.length}件</span><span id="chev-${ci}">▼</span></div>
+        </div>
+        <div id="ci-${ci}" class="cluster-items hidden">
+          ${items.map(item=>`<div class="cluster-item"><p class="cluster-item-q">${escHtml(item.question)}</p>${item.answer?`<p class="cluster-item-a">${escHtml(item.answer.slice(0,120))}...</p>`:'<p class="cluster-item-pending">未回答</p>'}</div>`).join("")}
+        </div>
+      </div>`;
+    });
+  }
+  document.getElementById("cluster-result").innerHTML=html;
+};
+
+window.toggleCluster = ci => {
+  const el = document.getElementById("ci-"+ci);
+  const ch = document.getElementById("chev-"+ci);
+  const open = el.classList.contains("hidden");
+  el.classList.toggle("hidden",!open);
+  ch.textContent = open?"▲":"▼";
+};
+
+// ─── Helpers ──────────────────────────────────────────────
+function fmtDate(ts){
+  if(!ts) return "";
+  const d = ts.toDate?ts.toDate():new Date(ts);
+  return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,"0")}:${String(d.getMinutes()).padStart(2,"0")}`;
+}
+function escHtml(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function showEl(id){ document.getElementById(id)?.classList.remove("hidden"); }
+function hideEl(id){ document.getElementById(id)?.classList.add("hidden"); }
+function showToast(msg,type="ok"){
+  const t=document.getElementById("toast");
+  t.textContent=msg; t.style.background=type==="err"?"#e8734a":"#c8b560";
+  t.style.display="block"; setTimeout(()=>t.style.display="none",2800);
+}
+
+window.setView = v => {
+  ["ask","login","answer","cluster"].forEach(x=>document.getElementById("view-"+x).classList.toggle("hidden",x!==v));
+  ["ask","answer","cluster"].forEach(x=>document.getElementById("nav-"+x)?.classList.toggle("active",x===v||(v==="login"&&x==="answer")));
+  if(v==="answer") renderAnswer();
+  if(v==="ask") renderRecent();
+};
+window.gotoAnswer = () => setView(window._getCurrentUser()?"answer":"login");
+window.gotoCluster = () => setView(window._getCurrentUser()?"cluster":"login");
+
+</script>
+</body>
+</html>
